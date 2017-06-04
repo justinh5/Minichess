@@ -5,17 +5,22 @@ import java.util.Random;
 
 public class Negamax {
 
-    private State s = new State();
+    private State s = new State();               // one state for do-undo moving
 
-    private long seed = System.nanoTime();
-    private TTable ttable = new TTable();
+    private long seed = System.nanoTime();       // seed for random numbers
+    private TTable ttable = new TTable();        // new transposition table object
 
-    private long timer_end;
-    private int duration = 7900;   // milliseconds per turn
+    private long timer_end;                      // the time that a move should end
+    private int duration = 7900;                 // milliseconds per turn
 
-    private int INFINITY = Integer.MAX_VALUE;
+    private int INFINITY = Integer.MAX_VALUE;    // max 32-bit integer closest to infinity
 
 
+    /**
+     * Play a local game cpu vs cpu. Can either choose to play using
+     * the standard negamax search of the Tnegamax search with the
+     * transposition table (not working yet).
+     */
     public void play() {
 
         boolean finished = false;
@@ -26,7 +31,7 @@ public class Negamax {
 
             s.printBoard();
 
-            List<Move> moves = s.moveGen();   // generate moves for player and prioritizes them
+            List<Move> moves = s.moveGen();
             Collections.shuffle(moves, new Random(seed));
             List<Move> orderedMoves = s.bestMoves(moves);
             Move best = orderedMoves.get(0);
@@ -77,6 +82,14 @@ public class Negamax {
     }
 
 
+    /**
+     * The IMCS player will use this method to simulate moves for the player
+     * and opponent during online play. If the opponentMove is null, the best
+     * move will be decided for the main player within the time limit using a
+     * depth-6 negamax search.
+     * @return The best move for the main player to send to the server and null
+     * for returning from the opponent's move.
+     */
     public String online(String opponentMove) {
 
         // Opponent's turn
@@ -89,9 +102,9 @@ public class Negamax {
         // Start the timer for current player's turn
         this.timer_end = System.currentTimeMillis() + this.duration;
 
-        List<Move> moves = s.moveGen();   // generate moves for player and prioritizes them
+        List<Move> moves = s.moveGen();                   // generate all moves
         Collections.shuffle(moves, new Random(seed));     // shuffle moves
-        List<Move> orderedMoves = s.bestMoves(moves);
+        List<Move> orderedMoves = s.bestMoves(moves);     // order moves by best score
         Move best = orderedMoves.get(0);
 
         // for each depth
@@ -126,7 +139,12 @@ public class Negamax {
     }
 
 
-    // Find the negamax value of a state using alpha-beta pruning.
+    /**
+     * Compares the best scores of the opponent and the main players,
+     * and uses alpha-beta pruning to prevent unnecessary searches.
+     * Stop searching when the timer is up.
+     * @return The estimated score for a state.
+     */
     private int negamax(State s, int depth, int alpha, int beta) {
 
         if(System.currentTimeMillis() > this.timer_end)
@@ -135,8 +153,8 @@ public class Negamax {
         if((s.checkFinalState() != 'o') || (depth == 0))
             return s.evaluate();
 
-        List<Move> moves = s.moveGen();   // generate moves for player and prioritizes them
-        Collections.shuffle(moves, new Random(seed));     // shuffle moves
+        List<Move> moves = s.moveGen();
+        Collections.shuffle(moves, new Random(seed));
         List<Move> orderedMoves = s.bestMoves(moves);
 
         int bestValue = -INFINITY;
@@ -156,6 +174,8 @@ public class Negamax {
 
 
 
+    // for testing zobrist hash values
+    // TODO delete me!!!!!
     char[][] board2 = new char[][] {
             { 'k', 'q', 'b', 'n', 'r'},
             { 'p', 'p', '.', 'p', 'p'},
@@ -166,7 +186,13 @@ public class Negamax {
     };
 
 
-    // Find the negamax value of a state with alpha-beta pruning and the transposition table.
+    /**
+     * Compares the best scores of the opponent and the main players,
+     * and uses alpha-beta pruning to prevent unnecessary searches.
+     * Stop searching when the timer is up. Uses the transposition table
+     * for states that are already computed.
+     * @return The estimated score for a state.
+     */
     private int Tnegamax(State s, int depth, int alpha, int beta) {
 
         if(System.currentTimeMillis() > this.timer_end)
@@ -187,8 +213,8 @@ public class Negamax {
         if((T != null) && ((T.alpha < T.value) || (T.value < T.beta)) && (T.depth >= depth))
             return T.value;
 
-        List<Move> moves = s.moveGen();   // generate moves for player and prioritizes them
-        Collections.shuffle(moves, new Random(seed));     // shuffle moves
+        List<Move> moves = s.moveGen();
+        Collections.shuffle(moves, new Random(seed));
         List<Move> orderedMoves = s.bestMoves(moves);
 
         int bestValue = -INFINITY;

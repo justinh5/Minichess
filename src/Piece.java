@@ -6,8 +6,6 @@ public class Piece {
     public boolean captured;    // is this piece off the board?
     public int promoted;        // movecount when pawn was promoted
 
-
-
     public Piece(char ident, int r, int f) {
         this.identity = ident;
         this.rank = r;

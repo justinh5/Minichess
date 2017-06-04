@@ -21,6 +21,8 @@ import java.net.Socket;
  * the opponent did, and send the own move to the opponent, respectively.
  * <p>
  */
+
+
 public class Client {
     BufferedReader in;
     PrintStream out;
@@ -292,5 +294,4 @@ public class Client {
         out.println(moveStr);
         out.flush();
     }
-
 }

@@ -69,6 +69,10 @@ public class State {
     }
 
 
+    /**
+     * The constructor that initializes the board to anything but the start state.
+     * Only used for testing the move generator.
+     */
     public State(char turn, char[][] setBoard) {
 
         this.turn = turn;
@@ -106,6 +110,11 @@ public class State {
     }
 
 
+    /**
+     * Updates the list of pieces for each player when starting with a board that
+     * is not in the default start state. This is currently only used for testing
+     * the move generator.
+     */
     public void updatePiece(char piece, int rank, int file) {
 
         List<Piece> pieces = Character.isLowerCase(piece) ? this.blackPieces : this.whitePieces;
@@ -333,6 +342,7 @@ public class State {
         return moves;
     }
 
+
     /**
      * Scans the lists of white and black pieces to find the
      * piece that matches the given rank and file.
@@ -463,7 +473,6 @@ public class State {
     }
 
 
-
     /**
      * Sorts a player's moves by score in descending order.
      * @param moves Randomly shuffled move list.
@@ -512,7 +521,6 @@ public class State {
             return '=';
         return 'o';            // game isn't over yet
     }
-
 
 
     /**

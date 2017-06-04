@@ -43,10 +43,11 @@ public class ZobristTable {
     }
 
 
-    /*
+    /**
      * Computes a simple hash for a state. Only used for the
      * starting state because we use a more simplified computation
      * for the rest of the states based off of this one.
+     * @return the hash of the starting board state.
      */
     public long startHash() {
 
@@ -80,6 +81,13 @@ public class ZobristTable {
         return prevHash ^ newSource ^ prevSource ^ newDest ^ prevDest ^ white ^ black;
     }*/
 
+
+    /**
+     * Computes the Zobrist hash of a board state.
+     * @param m, the move to get to the new state.
+     * @param prevHash, the hash of the old state.
+     * @return the hash of the new state.
+     */
     public long hash(Move m, long prevHash) {
 
         int sourceSquare = this.squares[m.fromRank][m.fromFile];
@@ -123,6 +131,9 @@ public class ZobristTable {
     }
 
 
+    /**
+     * @return the column index of a type of piece.
+     */
     private int getColumn(char p) throws UnknownError {
 
         switch (p) {
