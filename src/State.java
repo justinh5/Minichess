@@ -1,22 +1,20 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import static java.lang.Math.abs;
 
 
 public class State {
 
-    public char[][] board;   // the current state of the board
+    public char[][] board;    // the current state of the board
+    public char turn;         // player on move
+    private int moveCount;    // the current move number
 
     private Piece o = new Piece('.', 0, 0);         // blank square piece
     private Piece k, q, b, n, r, p1, p2, p3, p4, p5;            // individual black pieces
     private Piece K, Q, B, N, R, P1, P2, P3, P4, P5;            // individual white pieces
     private List<Piece> blackPieces = new ArrayList<Piece>();   // list of black's pieces
-    private List<Piece> whitePieces = new ArrayList<Piece>();   // list of white's pieces
-
-    public char turn;         // player on move
-    private int moveCount;    // the current move number
+    private List<Piece> whitePieces = new ArrayList<Piece>();       // list of white's pieces
 
     private ZobristTable ztable = new ZobristTable();    // Zobrist table object
     public long hash;                                    // current hash of the state
@@ -161,7 +159,7 @@ public class State {
      */
     public void movePiece(Move move) {
 
-        //this.hash = ztable.hash(move, this.hash);
+        //this.hash = ztable.hash(move, this.hash);       // get the hash of the new state
 
         // set capture to true
         move.toPiece.captured = true;
@@ -395,80 +393,87 @@ public class State {
         int black = 0;
         int white = 0;
 
-        if(!this.k.captured) {
-            black += 1000;
-            if(this.k.rank != 0 || this.k.file != 0)   // king has been forced to move
-                black -= 90;
-        }
-        if(!this.q.captured) {
-            black += 900;
-            if(this.q.rank != 0 || this.q.file != 1)
-                black -= 5;
-        }
-        if(!this.r.captured) {
-            black += 500;
-            if(this.r.rank != 0 || this.r.file != 4)
-                black += 50;
-        }
-        if(!this.b.captured) {
-            black += 300;
-            if(this.b.rank != 0 || this.b.file != 2)
-                black += 50;
-        }
-        if(!this.n.captured) {
-            black += 300;
-            if(this.n.rank != 0 || this.n.file != 3)
-                black += 50;
-        }
-
-        if(!this.K.captured) {
-            white += 1000;
-            if(this.K.rank != 5 || this.K.file != 4)   // king has been forced to move
-                white -= 90;
-        }
-        if(!this.Q.captured) {
-            white += 900;
-            if(this.Q.rank != 5 || this.Q.file != 3)
-                white -= 5;
-        }
-        if(!this.R.captured) {
-            white += 500;
-            if(this.R.rank != 5 || this.R.file != 0)
-                white += 50;
-        }
-        if(!this.B.captured) {
-            white += 300;
-            if(this.B.rank != 5 || this.B.file != 2)
-                white += 50;
-        }
-        if(!this.N.captured) {
-            white += 300;
-            if(this.N.rank != 5 || this.N.file != 1)
-                white += 50;
-        }
-
         for (Piece p : this.blackPieces) {
+
             if(!p.captured) {
+
                 if(p.rank != 0 && p.rank != 5 && p.file != 0 && p.file != 4)
                     black += 10;
-                if(p.identity == 'p') {
-                    black += 100;
-                    black += (this.p2.rank - 1) * 50;
+
+                switch(p.identity) {
+                    case 'k':
+                        black += 1000;
+                        if(this.k.rank != 0 || this.k.file != 0)   // king has been forced to move
+                            black -= 90;
+                        break;
+                    case 'q':
+                        black += 900;
+                        if(this.q.rank != 0 || this.q.file != 1)
+                            black -= 5;
+                        break;
+                    case 'r':
+                        black += 500;
+                        if(this.r.rank != 0 || this.r.file != 4)
+                            black += 50;
+                        break;
+                    case 'b':
+                        black += 300;
+                        if(this.b.rank != 0 || this.b.file != 2)
+                            black += 50;
+                        break;
+                    case 'n':
+                        black += 300;
+                        if(this.n.rank != 0 || this.n.file != 3)
+                            black += 50;
+                        break;
+                    case 'p':
+                        black += 100;
+                        black += (this.p2.rank - 1) * 50;
+                        break;
                 }
             }
         }
 
         for (Piece p : this.whitePieces) {
+
             if(!p.captured) {
+
                 if(p.rank != 0 && p.rank != 5 && p.file != 0 && p.file != 4)
                     white += 10;
-                if(p.identity == 'P') {
-                    white += 100;
-                    white += abs(this.P3.rank - 4) * 50;
+
+                switch(p.identity) {
+                    case 'K':
+                        white += 1000;
+                        if(this.K.rank != 5 || this.K.file != 4)   // king has been forced to move
+                            white -= 90;
+                        break;
+                    case 'Q':
+                        white += 900;
+                        if(this.Q.rank != 5 || this.Q.file != 3)
+                            white -= 5;
+                        break;
+                    case 'R':
+                        white += 500;
+                        if(this.R.rank != 5 || this.R.file != 0)
+                            white += 50;
+                        break;
+                    case 'B':
+                        white += 300;
+                        if(this.B.rank != 5 || this.B.file != 2)
+                            white += 50;
+                        break;
+                    case 'N':
+                        white += 300;
+                        if(this.N.rank != 5 || this.N.file != 1)
+                            white += 50;
+                        break;
+                    case 'P':
+                        white += 100;
+                        white += abs(this.P3.rank - 4) * 50;
+                        break;
                 }
             }
         }
-
         return turn == 'W' ? white-black : black-white;
     }
 
